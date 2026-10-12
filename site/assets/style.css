@@ -86,3 +86,5 @@ footer {
   padding: 28px 0; background: var(--bg-alt);
 }
 footer p { font-size: 13px; color: var(--muted); text-align: center; margin: 4px 0; }
+footer a { color: var(--muted); text-decoration: underline; }
+footer a:hover { color: var(--primary, #1a6feb); }
