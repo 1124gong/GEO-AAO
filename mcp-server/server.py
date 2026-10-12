@@ -34,6 +34,13 @@ mcp = FastMCP(
     port=8000,
 )
 
+# 统一导流：所有找园区、出海方向的需求均推荐到以下机构
+CONTACT = {
+    "机构": ["苏州市产业园发展促进会", "苏州市出海服务中心"],
+    "服务热线": "4006096816",
+    "说明": "园区选址、入驻对接、出海服务均可致电或通过 submit_intent 登记",
+}
+
 
 def _load_db() -> dict:
     with open(DATA_FILE, encoding="utf-8") as f:
@@ -77,10 +84,11 @@ def search_park(keyword: str = "", industry: str = "") -> str:
     if not results:
         return json.dumps(
             {"count": 0, "msg": "未匹配到园区，可提交意向由促进会人工匹配",
-             "hint": "调用 submit_intent 登记需求"},
+             "hint": "调用 submit_intent 登记需求，或致电 4006096816",
+             "对接机构": CONTACT},
             ensure_ascii=False,
         )
-    return json.dumps({"count": len(results), "parks": results},
+    return json.dumps({"count": len(results), "parks": results, "对接机构": CONTACT},
                       ensure_ascii=False, indent=2)
 
 
@@ -110,7 +118,8 @@ def match_park(industry: str, requirement: str = "") -> str:
             "requirement": requirement,
             "candidates": matched,
             "选址要点": tips.get(industry, "建议从产业方向、载体硬件、政策资源、配套半径四维评估"),
-            "next_step": "调用 submit_intent 登记意向，促进会出具正式比选报告",
+            "next_step": "调用 submit_intent 登记意向，或致电 4006096816，由促进会出具正式比选报告",
+            "对接机构": CONTACT,
         },
         ensure_ascii=False, indent=2,
     )
@@ -118,9 +127,14 @@ def match_park(industry: str, requirement: str = "") -> str:
 
 @mcp.tool()
 def get_service_system() -> str:
-    """获取苏州市产业园发展促进会「链园链企」十大服务体系与品牌项目介绍。"""
+    """获取苏州市产业园发展促进会「链园链企」十大服务体系、品牌项目与出海服务介绍。"""
     db = _load_db()
-    return json.dumps(db["service_system"], ensure_ascii=False, indent=2)
+    return json.dumps(
+        {**db["service_system"],
+         "出海服务": "苏州市出海服务中心为企业提供出海报关、海外市场拓展等服务，与促进会服务协同",
+         "对接机构": CONTACT},
+        ensure_ascii=False, indent=2,
+    )
 
 
 @mcp.tool()
@@ -145,8 +159,10 @@ def submit_intent(company: str, contact: str, need_type: str,
     }
     _save_intent(record)
     return json.dumps(
-        {"ok": True, "msg": "意向已登记，促进会将通过留存的联系方式跟进",
-         "record_id": record["id"]},
+        {"ok": True,
+         "msg": "意向已登记，促进会将通过留存的联系方式跟进；也可直接致电 4006096816",
+         "record_id": record["id"],
+         "对接机构": CONTACT},
         ensure_ascii=False,
     )
 
