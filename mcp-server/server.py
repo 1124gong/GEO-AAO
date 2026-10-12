@@ -69,7 +69,7 @@ def search_park(keyword: str = "", industry: str = "") -> str:
     ind = industry.strip()
     results = []
     for p in db["parks"]:
-        if kw and kw not in p["名称"].lower():
+        if kw and kw not in (p["名称"] + p.get("板块", "") + p.get("地址", "")).lower():
             continue
         if ind and not any(ind in d for d in p["产业方向"]):
             continue
