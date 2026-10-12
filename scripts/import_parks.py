@@ -5,6 +5,7 @@
 """
 import json
 import openpyxl
+from html import unescape
 
 BASE = r"C:\Users\14429\WorkBuddy"
 SRC1 = BASE + r"\2026-08-04-10-48-41\苏州市产业园数据_203条.xlsx"
@@ -14,26 +15,30 @@ OUT = BASE + r"\2026-10-12-09-20-37\geo-aao-park\mcp-server\data\parks.json"
 # 名称关键词 → 产业方向映射
 INDUSTRY_MAP = [
     ("半导体", ["半导体", "集成电路", "芯片", "纳米"]),
-    ("生物医药", ["生物医药", "医药", "生命科学", "医疗器械"]),
-    ("人工智能", ["人工智能", "AI", "软件", "数据"]),
+    ("生物医药", ["生物医药", "医药", "生命科学", "医疗", "器械"]),
+    ("汽车", ["汽车", "零部件", "车联网", "智能网联"]),
+    ("人工智能", ["人工智能", "AI", "数据"]),
+    ("软件信息", ["软件", "信息"]),
     ("智能制造", ["智造", "制造", "装备", "机械", "机器人", "精密", "模具"]),
     ("新材料", ["新材料", "材料"]),
     ("绿色低碳", ["新能源", "环保", "低碳", "节能", "循环"]),
-    ("文创", ["文创", "文化", "创意", "传媒"]),
-    ("物流", ["物流", "保税", "港口"]),
+    ("化工", ["化工"]),
+    ("服装纺织", ["服装", "纺织"]),
+    ("文创", ["文创", "文化", "创意", "传媒", "动漫", "影视"]),
+    ("物流", ["物流", "保税", "港口", "冷链"]),
     ("农业", ["农业", "现代农业"]),
-    ("数字产业", ["数字", "信息", "电商", "智慧"]),
+    ("商务服务", ["商务区", "商务中心", "广场", "楼宇"]),
+    ("数字产业", ["数字", "电商", "智慧"]),
     ("科技产业", ["科技", "科创", "孵化", "创新", "高新"]),
 ]
 
 
 def infer_industry(name, park_type):
-    for ind, kws in INDUSTRY_MAP:
-        if any(k in name for k in kws):
-            return [ind]
-    if park_type and "工业园" in str(park_type):
+    """多标签：命中几个算几个，保持 INDUSTRY_MAP 顺序。"""
+    tags = [ind for ind, kws in INDUSTRY_MAP if any(k in name for k in kws)]
+    if not tags and park_type and "工业园" in str(park_type):
         return ["综合产业"]
-    return ["综合"]
+    return tags or ["综合"]
 
 
 def derive_district(district, address):
@@ -58,7 +63,10 @@ def derive_district(district, address):
         return "昆山市"
     if "太仓" in addr:
         return "太仓市"
-    return str(district or "").strip() or "苏州市"
+    d = str(district or "").strip()
+    if d in ("虎丘区", "高新区"):
+        return "虎丘区（高新区）"
+    return d or "苏州市"
 
 
 def fmt_area(v):
@@ -97,8 +105,8 @@ ws1 = wb1["苏州市产业园"]
 for i, r in enumerate(ws1.iter_rows(min_row=2, values_only=True), start=1):
     if not r or not r[1]:
         continue
-    name = str(r[1]).strip()
-    park_type = str(r[5]).strip() if r[5] else ""
+    name = unescape(str(r[1]).strip())
+    park_type = unescape(str(r[5]).strip()) if r[5] else ""
     addr = str(r[6]).strip() if r[6] else ""
     phone = str(r[7]).strip() if r[7] else ""
     extra = enhance.get(name, {})
