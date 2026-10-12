@@ -1,0 +1,23 @@
+# 苏州产业园服务（苏州产业园服务业务门户）
+
+> 苏州市产业园发展促进会业务信息站。理念「产业园就是产业链」，主打总对总平台。
+> 会员产业园 400+，链接园内企业 8 万+，上市企业 70+。2019 年 8 月成立，AAAA 级社会组织。
+
+## 站点结构
+
+- 首页：定位、核心数据背书、三大问题域（企业找园区 / 园区找企业 / 企业链企业）
+- 服务体系：链园链企十大服务体系 + 百园万企服务行 + 产业进化论峰会
+- 园区资源：按产业方向分类的选址参考
+- 常见问答：10 条高频问答（含 Schema.org FAQPage 结构化数据，AI 引擎可解析）
+
+## AI 引擎接入
+
+- llms.txt：位于根目录，供大模型爬虫发现站点内容结构
+- robots.txt：默认放行主流 AI 爬虫（GPTBot、ClaudeBot、PerplexityBot、Google-Extended、Bytespider）
+- sitemap.xml：站点地图，正式地址 https://1124gong.github.io/GEO-AAO/
+- JSON-LD：首页含 Organization 结构化数据，FAQ 页含 FAQPage 结构化数据
+
+## 联系与入口
+
+- 官方网站：ipark.org.cn
+- AI 助手：基于 MCP Server（见项目 mcp-server 目录）提供园区检索、服务匹配、意向登记
