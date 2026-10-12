@@ -27,13 +27,23 @@
 | 3 验证 | 浏览器访问 http://localhost:8000/mcp 返回 406/405 即为在线（MCP 端点不接受 GET 内容） |
 | 4 测试工具 | 用 MCP 客户端（如 Cursor、Cherry Studio）连接 http://localhost:8000/mcp 调用 search_park |
 
-## 暴露公网
+## 正式部署（已上线）
+
+| 项 | 值 |
+|---|---|
+| 公网端点 | http://119.45.16.249:8100/mcp |
+| 部署位置 | 阿里云 VPS /opt/park-mcp（Docker 容器 park-mcp，restart unless-stopped） |
+| 数据目录 | VPS /opt/park-mcp/data（挂载进容器，意向登记持久化） |
+| 更新数据 | 替换 VPS 上的 data/parks.json 后执行 docker restart park-mcp |
+
+容器运维命令（VPS 上）：sudo docker logs/restart/stop park-mcp
+
+## 备选暴露方式
 
 | 方式 | 命令/说明 | 适用 |
 |---|---|---|
-| localtunnel | lt --port 8000（或 npx localtunnel --port 8000） | 快速验证 |
-| frp + 阿里云 VPS | VPS 装 frps，台式机 frpc 转发 8000 端口 | 正式期，稳定 |
-| 迁 VPS | 整目录 scp 上 VPS，Docker 或 systemd 常驻 | 7×24 正式运行 |
+| localtunnel | lt --port 8000（注意 loca.lt 有密码页，Agent 平台直连可能被拦） | 本机临时调试 |
+| 本机直跑 | venv 内 python server.py，端点 http://localhost:8000/mcp | 开发调试 |
 
 ## 接入 Agent 生态
 
