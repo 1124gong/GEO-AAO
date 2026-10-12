@@ -25,7 +25,7 @@ rm -rf /tmp/geo-aao-repo
 git clone -q -b main /tmp/geo-aao.bundle /tmp/geo-aao-repo
 cd /tmp/geo-aao-repo
 for i in 1 2 3 4 5; do
-  git push -q https://1124gong:$TOK@github.com/'"$REPO"'.git main && break
+  if git push -q https://1124gong:$TOK@github.com/'"$REPO"'.git main; then break; fi
   echo "  重试 $i ..."; sleep 10
 done
 curl -s -m 15 "https://api.github.com/repos/'"$REPO"'/git/refs/heads/main" | grep -o "\"sha\": *\"[a-f0-9]\{7\}\"" && echo "推送成功"
